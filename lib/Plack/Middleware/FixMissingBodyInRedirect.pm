@@ -30,13 +30,12 @@ sub call {
 </body>
 </html>
 EOF
-                $response->[2] = $body;
-                $headers->push('Content-Type' => 'text/html; charset=utf-8');
-		$headers->push('Location' => $encoded_location);
-		return $response;
+                $response->[2] = [$body]; # body should be either an array ref or file handle
+                $headers->set('Location' => $encoded_location);
+                return $response;
 	    }
 	}
     });
 }
- 
+
 1;
