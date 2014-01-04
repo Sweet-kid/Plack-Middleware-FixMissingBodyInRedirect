@@ -7,15 +7,15 @@ use HTTP::Request::Common;
 use Carp::Always;
 
 test_psgi app => builder {
-    enable 'FixMissingBodyInRedirect';  # X is the name of the Plack::Middleware module 
+    enable 'FixMissingBodyInRedirect';
     sub {
 	my $env = shift;
 	[302,
 	 [ "Location" => '/xyz',
 	   "Content-Type" => 'text/html; charset=utf-8'],
-	''];
+	 ''];
     }
-}, 
+},
 client => sub {
     my $cb = shift;
 
