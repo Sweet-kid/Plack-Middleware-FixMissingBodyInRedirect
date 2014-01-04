@@ -16,7 +16,6 @@ sub call {
 	my $headers = Plack::Util::headers($response->[1]); # first index contains HTTP header
 	if( $headers->exists('Location') ) {
 	    my $location = $headers->get("Location");
-	    $self->log->debug(qq/Redirecting to "$location"/) if $self->app->debug;
 	    if ( !$response->[2] ) {
 		print "inside if\n";
 		my $encoded_location = encode_entities($location);
