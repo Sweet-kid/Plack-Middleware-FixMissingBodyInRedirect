@@ -5,6 +5,7 @@ use parent qw( Plack::Middleware );
 
 use Plack::Util;
 use HTML::Entities;
+# ABSTRACT: Plack::Middleware which sets body for redirect response, if it's not already set
 
 sub call {
     my ($self, $env) = @_;
