@@ -56,7 +56,7 @@ Plack::Middleware::FixMissingBodyInRedirect - set body for redirect response, if
    my $app = sub { ...  };
 
    builder {
-       enable "Plack::Middleware::FixMissingBodyInRedirect";
+       enable "FixMissingBodyInRedirect";
        $app;
    };
 
