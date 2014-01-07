@@ -13,14 +13,14 @@ sub call {
     my $res = $self->app->($env);
 
     return $self->response_cb($res, sub {
-	my $response = shift;
-	my $headers = Plack::Util::headers($response->[1]); # first index contains HTTP header
-	if( $headers->exists('Location') ) {
-	    my $location = $headers->get("Location");
-	    # checking if body (which is at index 2) is set or not
-	    if ( !$response->[2] ) {
-		my $encoded_location = encode_entities($location);
-		my $body =<<"EOF";
+        my $response = shift;
+        my $headers = Plack::Util::headers($response->[1]); # first index contains HTTP header
+        if( $headers->exists('Location') ) {
+            my $location = $headers->get("Location");
+            my $encoded_location = encode_entities($location);
+            # checking if body (which is at index 2) is set or not
+            if ( !_is_body_set($response)) {
+                my $body =<<"EOF";
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
