@@ -53,7 +53,7 @@ sub _is_body_set {
                 return 0;
             } else {
                 foreach my $element ( @body ) {
-                    if( $element ) {
+                    if( defined $element && $element =~ /.+/ ) {
                         # if even a single $element is set, then body is set, so return true
                         return 1;
                     }
