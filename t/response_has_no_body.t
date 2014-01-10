@@ -16,6 +16,13 @@ test_psgi app => builder {
          []];
     };
 
+    mount '/empty_string' => sub {
+        [302,
+         [ "Location" => '/xyz',
+           "Content-Type" => 'text/html; charset=utf-8'],
+         ['']];
+    };
+
     mount '/array_with_one_undef' => sub {
         [302,
          [ "Location" => '/xyz',
@@ -60,12 +67,23 @@ test_psgi app => builder {
            "Content-Type" => 'text/html; charset=utf-8'],
          $fh];
     };
+
+    mount '/zeros_only' => sub {
+        [302,
+         [ "Location" => '/xyz',
+           "Content-Type" => 'text/html; charset=utf-8'],
+         [0000]];
+    };
 },
 client => sub {
     my $cb = shift;
 
     my @responses = (
         [ '/empty_array',
+          qr/<body>/,
+          302,
+          'text/html; charset=utf-8' ],
+        [ '/empty_string',
           qr/<body>/,
           302,
           'text/html; charset=utf-8' ],
@@ -87,6 +105,10 @@ client => sub {
           'text/html; charset=utf-8' ],
         [ '/body_with_good_file_handle',
           qr!<html><body>I'm file's text</body></html>!,
+          302,
+          'text/html; charset=utf-8' ],
+        [ '/zeros_only',
+          qr!^0!,
           302,
           'text/html; charset=utf-8' ],
     );
