@@ -13,21 +13,21 @@ test_psgi app => builder {
     mount '/empty_array' => sub {
         [302,
          [ "Location" => '/xyz',
-           "Content-Type" => 'text/html; charset=utf-8'],
+           ],
          []];
     };
 
     mount '/empty_string' => sub {
         [302,
          [ "Location" => '/xyz',
-           "Content-Type" => 'text/html; charset=utf-8'],
+           ],
          ['']];
     };
 
     mount '/array_with_one_undef' => sub {
         [302,
          [ "Location" => '/xyz',
-           "Content-Type" => 'text/html; charset=utf-8'],
+           ],
            [undef]];
     };
 
@@ -77,7 +77,6 @@ test_psgi app => builder {
     };
 
     # Case when one has a custom filehandle like object that does ->getline
-
     mount '/filehandle_like' => sub {
         [302,
          [ "Location" => '/xyz',
@@ -87,6 +86,27 @@ test_psgi app => builder {
             Plack::Util::inline_object(getline => sub { shift @lines }, close => sub {});     
          }];
     };
+
+    # test for delayed style response
+    mount '/delayed_tuple' => sub {
+      my $env = shift;
+      return sub { shift->(
+          [302, 
+            ['Location' => '/xyz',"Content-Type" => 'text/html; charset=utf-8'], 
+              ['aaabbbccc']]) };
+    };
+
+    # test for delayed write
+    mount '/delayed_write' => sub {
+      my $env = shift;
+      return sub {
+        my $writer = shift->([302,
+          ['Location' => '/xyz',"Content-Type" => 'text/html; charset=utf-8']]);
+        $writer->write('aaabbbccc');
+        $writer->close;
+      }
+    };
+
 },
 client => sub {
     my $cb = shift;
@@ -126,6 +146,10 @@ client => sub {
           'text/html; charset=utf-8' ],
         [ '/filehandle_like',
           qr!aaa\nbbb\n!,
+          302,
+          'text/html; charset=utf-8' ],
+        [ '/delayed_tuple',
+          qr!aaabbbccc!,
           302,
           'text/html; charset=utf-8' ],
 
