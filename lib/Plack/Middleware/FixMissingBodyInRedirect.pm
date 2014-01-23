@@ -14,6 +14,7 @@ sub call {
 
     return $self->response_cb($res, sub {
         my $response = shift;
+        return unless $response->[0] =~/3\d\d/; # only handle redirect statuses.
         my $headers = Plack::Util::headers($response->[1]); # first index contains HTTP header
         if( $headers->exists('Location') ) {
             my $location = $headers->get("Location");
