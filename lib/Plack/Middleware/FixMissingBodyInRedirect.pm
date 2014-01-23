@@ -37,7 +37,6 @@ EOF
                 $headers->set('Location' => $encoded_location);
                 $headers->set('Content-Type' => 'text/html; charset=utf-8');
                 $headers->set('Content-Length' => length($body));
-                return $response;
             }
         }
     });
@@ -75,7 +74,9 @@ sub _is_body_set {
         } elsif(Scalar::Util::blessed($response[2]) and $response[2]->can('getline')) {
           # Well, this totally sucks, we have a filehandle like object but we can't
           # test if it has any contents because the PSGI spec only requires getline.
-          # so the safe thing is to assume its all good. 
+          # We could wrap this in a proxy object to provide default content if needed
+          # For now we will assume someone knows what they are doing.
+
           return 1;
         }
     }
