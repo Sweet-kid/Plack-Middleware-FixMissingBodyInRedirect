@@ -62,7 +62,7 @@ sub _is_body_set {
                     }
                 }
                 # flow will reach this statement only after traversing
-                # the whole body array in above foreach loop, whi[ch means that
+                # the whole body array in above foreach loop, which means that
                 # no element is set in the body array, so return false
                 return 0;
             }
