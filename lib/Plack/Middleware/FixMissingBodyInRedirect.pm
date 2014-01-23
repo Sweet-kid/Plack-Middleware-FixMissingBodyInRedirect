@@ -80,6 +80,10 @@ sub _is_body_set {
 
           return 1;
         }
+    } else {
+      # This is the streaming case.  for now we assume "all is well'
+
+      return 1;
     }
 }
 

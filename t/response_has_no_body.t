@@ -100,8 +100,9 @@ test_psgi app => builder {
     mount '/delayed_write' => sub {
       my $env = shift;
       return sub {
-        my $writer = shift->([302,
-          ['Location' => '/xyz',"Content-Type" => 'text/html; charset=utf-8']]);
+        my $responder = shift;
+        my $writer = $responder->(
+          [302, ['Location' => '/xyz',"Content-Type" => 'text/html; charset=utf-8']]);
         $writer->write('aaabbbccc');
         $writer->close;
       }
@@ -149,6 +150,10 @@ client => sub {
           302,
           'text/html; charset=utf-8' ],
         [ '/delayed_tuple',
+          qr!aaabbbccc!,
+          302,
+          'text/html; charset=utf-8' ],
+        [ '/delayed_write',
           qr!aaabbbccc!,
           302,
           'text/html; charset=utf-8' ],
