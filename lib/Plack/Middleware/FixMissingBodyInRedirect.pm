@@ -5,6 +5,7 @@ use parent qw( Plack::Middleware );
 
 use Plack::Util;
 use HTML::Entities;
+use Scalar::Util;
 # ABSTRACT: Plack::Middleware which sets body for redirect response, if it's not already set
 
 sub call {
@@ -61,7 +62,7 @@ sub _is_body_set {
                     }
                 }
                 # flow will reach this statement only after traversing
-                # the whole body array in above foreach loop, which means that
+                # the whole body array in above foreach loop, whi[ch means that
                 # no element is set in the body array, so return false
                 return 0;
             }
@@ -71,6 +72,11 @@ sub _is_body_set {
             } else {
                 return 1;
             }
+        } elsif(Scalar::Util::blessed($response[2]) and $response[2]->can('getline')) {
+          # Well, this totally sucks, we have a filehandle like object but we can't
+          # test if it has any contents because the PSGI spec only requires getline.
+          # so the safe thing is to assume its all good. 
+          return 1;
         }
     }
 }

@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use Plack::Test;
 use Plack::Builder;
+use Plack::Util;
 use HTTP::Request::Common;
 use Carp::Always;
 
@@ -74,6 +75,18 @@ test_psgi app => builder {
            "Content-Type" => 'text/html; charset=utf-8'],
          [0000]];
     };
+
+    # Case when one has a custom filehandle like object that does ->getline
+
+    mount '/filehandle_like' => sub {
+        [302,
+         [ "Location" => '/xyz',
+           "Content-Type" => 'text/html; charset=utf-8'],
+         ,do {
+            my @lines = ( "aaa\n", "bbb\n");
+            Plack::Util::inline_object(getline => sub { shift @lines }, close => sub {});     
+         }];
+    };
 },
 client => sub {
     my $cb = shift;
@@ -111,6 +124,11 @@ client => sub {
           qr!^0!,
           302,
           'text/html; charset=utf-8' ],
+        [ '/filehandle_like',
+          qr!aaa\nbbb\n!,
+          302,
+          'text/html; charset=utf-8' ],
+
     );
 
     foreach my $response ( @responses ) {
