@@ -6,6 +6,7 @@ use parent qw( Plack::Middleware );
 use Plack::Util;
 use HTML::Entities;
 use Scalar::Util;
+use Plack::Middleware::FixMissingBodyInRedirect::Proxy;
 # ABSTRACT: Plack::Middleware which sets body for redirect response, if it's not already set
 
 sub call {
@@ -22,7 +23,54 @@ sub call {
             my $encoded_location = encode_entities($location);
             # checking if body (which is at index 2) is set or not
             if ( !_is_body_set($response)) {
-                my $body =<<"EOF";
+                my $body = $self->_default_html_body($encoded_location);
+                $response->[2] = [$body];
+                my $content_length = Plack::Util::content_length($body);
+                $headers->set('Content-Length' => $content_length);
+                $headers->set('Content-Type' => 'text/html; charset=utf-8');
+            }
+
+            ## Streaming case...
+            if(scalar( @$response ) == 2 ) {
+              my $first_call = 1;
+              if(! $headers->exists('Content-Type')) {
+                $headers->set('Content-Type' => 'text/html; charset=utf-8')
+              } else {
+                # Well, if there's a content-type, one hopes there's content
+                # but at this point we can't really determine...  So this
+                # means we might return default content that doesn't match the
+                # declared content type :(
+              }
+              return sub {
+                my $chunk = shift;
+                if( $first_call && !defined($chunk) ) {
+                  $first_call = 0;
+                  $chunk = $self->_default_html_body($encoded_location);
+                }
+                return $chunk;
+              };
+            }
+
+            ## Filehandle like object case
+            if(Scalar::Util::blessed($response->[2]) and $response->[2]->can('getline')) {
+              if(! $headers->exists('Content-Type')) {
+                $headers->set('Content-Type' => 'text/html; charset=utf-8')
+              } else {
+                # Well, if there's a content-type, one hopes there's content
+                # but at this point we can't really determine...  So this
+                # means we might return default content that doesn't match the
+                # declared content type :(
+              }
+              $response->[2] = Plack::Middleware::FixMissingBodyInRedirect::Proxy->new(
+                $response->[2], $self->_default_html_body($encoded_location));
+            }
+        }
+    });
+}
+
+sub _default_html_body {
+  my ($self_or_class, $encoded_location) = @_;
+  return <<"EOF";
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
@@ -33,14 +81,6 @@ sub call {
 </body>
 </html>
 EOF
-                $response->[2] = [$body]; # body should be either an array ref or file handle
-
-                my $content_length = Plack::Util::content_length($body);
-                $headers->set('Content-Length' => $content_length);
-                $headers->set('Content-Type' => 'text/html; charset=utf-8');
-            }
-        }
-    });
 }
 
 sub _is_body_set {
@@ -75,19 +115,18 @@ sub _is_body_set {
         } elsif(Scalar::Util::blessed($response[2]) and $response[2]->can('getline')) {
           # Well, this totally sucks, we have a filehandle like object but we can't
           # test if it has any contents because the PSGI spec only requires getline.
-          # We could wrap this in a proxy object to provide default content if needed
-          # For now we will assume someone knows what they are doing.
-
+          # For now we assume "all is well', we handle this above (sorta...)
           return 1;
         }
     } else {
-      # This is the streaming case.  for now we assume "all is well'
-
+      # This is the streaming case.  for now we assume "all is well', we handle this
+      # above (sorta...)
       return 1;
     }
 }
 
 1;
+
 __END__
 
 =head1 NAME

@@ -108,6 +108,25 @@ test_psgi app => builder {
       }
     };
 
+    mount '/delayed_nowrite' => sub {
+      my $env = shift;
+      return sub {
+        my $responder = shift;
+        my $writer = $responder->(
+          [302, ['Location' => '/xyz']]);
+        $writer->close;
+      }
+    };
+
+    mount '/filehandle_like_empty' => sub {
+        [302,
+         [ "Location" => '/xyz' ],
+         ,do {
+            my @lines = ();
+            Plack::Util::inline_object(getline => sub { shift @lines }, close => sub {});     
+         }];
+    };
+
 },
 client => sub {
     my $cb = shift;
@@ -155,6 +174,14 @@ client => sub {
           'text/html; charset=utf-8' ],
         [ '/delayed_write',
           qr!aaabbbccc!,
+          302,
+          'text/html; charset=utf-8' ],
+        [ '/delayed_nowrite',
+          qr/<body>/,
+          302,
+          'text/html; charset=utf-8' ],
+        [ '/filehandle_like_empty',
+          qr/<body>/,
           302,
           'text/html; charset=utf-8' ],
 
