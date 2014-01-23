@@ -34,9 +34,10 @@ sub call {
 </html>
 EOF
                 $response->[2] = [$body]; # body should be either an array ref or file handle
-                $headers->set('Location' => $encoded_location);
+
+                my $content_length = Plack::Util::content_length($body);
+                $headers->set('Content-Length' => $content_length);
                 $headers->set('Content-Type' => 'text/html; charset=utf-8');
-                $headers->set('Content-Length' => length($body));
             }
         }
     });
