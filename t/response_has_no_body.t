@@ -90,7 +90,7 @@ test_psgi app => builder {
            "Content-Type" => 'text/html; charset=utf-8'],
          ,do {
             my @lines = ( "aaa\n", "bbb\n");
-            Plack::Util::inline_object(getline => sub { shift @lines }, close => sub {});     
+            Plack::Util::inline_object(getline => sub { shift @lines }, close => sub {});
          }];
     };
 
@@ -98,8 +98,8 @@ test_psgi app => builder {
     mount '/delayed_tuple' => sub {
       my $env = shift;
       return sub { shift->(
-          [302, 
-            ['Location' => '/xyz',"Content-Type" => 'text/html; charset=utf-8'], 
+          [302,
+            ['Location' => '/xyz',"Content-Type" => 'text/html; charset=utf-8'],
               ['aaabbbccc']]) };
     };
 
@@ -130,7 +130,7 @@ test_psgi app => builder {
          [ "Location" => '/xyz' ],
          ,do {
             my @lines = ();
-            Plack::Util::inline_object(getline => sub { shift @lines }, close => sub {});     
+            Plack::Util::inline_object(getline => sub { shift @lines }, close => sub {});
          }];
     };
 },
