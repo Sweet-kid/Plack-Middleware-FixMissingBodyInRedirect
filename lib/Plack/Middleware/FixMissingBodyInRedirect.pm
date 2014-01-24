@@ -101,4 +101,9 @@ Plack::Middleware::FixMissingBodyInRedirect - set body for redirect response, if
 
 This module sets body in redirect response, if it's not already set.
 
+=Head1 CONTRIBUTORS
+
+John Napiorkowski <jjn1056@yahoo.com>
+Graham Knop <haarg@haarg.org>
+
 =cut
