@@ -104,6 +104,9 @@ This module sets body in redirect response, if it's not already set.
 =head1 CONTRIBUTORS
 
 John Napiorkowski <jjn1056@yahoo.com>
+
 Graham Knop <haarg@haarg.org>
+
+n0body, Mark Ellis <m@rkellis.com>
 
 =cut
