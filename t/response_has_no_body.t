@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 47;
 use Plack::Test;
 use Plack::Builder;
 use Plack::Util;
@@ -215,8 +215,13 @@ client => sub {
         is( $res->header('Content-Type'),
             $content_type,
             "Content-Type for $route is $content_type");
+
+        next if !defined $res->header('Content-Length');
+        my $content_length = length( $res->content );
+        is( $res->header('Content-Length'),
+            $content_length,
+            "Content-Length for $route is correct (${content_length})");
     }
 };
 
 unlink "output.txt";
-done_testing;

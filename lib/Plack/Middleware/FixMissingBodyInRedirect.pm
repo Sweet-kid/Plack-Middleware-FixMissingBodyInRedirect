@@ -21,7 +21,7 @@ sub call {
             if (@$res == 3 && !_is_body_set($res->[2])) {
                 my $body = $self->_default_html_body($location);
                 $res->[2] = [$body];
-                my $content_length = Plack::Util::content_length($body);
+                my $content_length = Plack::Util::content_length([$body]);
                 $headers->set('Content-Length' => $content_length);
                 $headers->set('Content-Type' => 'text/html; charset=utf-8');
                 return;
