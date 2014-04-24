@@ -81,10 +81,6 @@ sub _is_body_set {
 
 __END__
 
-=head1 NAME
-
-Plack::Middleware::FixMissingBodyInRedirect - set body for redirect response, if it's not already set
-
 =head1 SYNOPSIS
 
    use strict;
