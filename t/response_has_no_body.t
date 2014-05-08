@@ -5,7 +5,6 @@ use Plack::Test;
 use Plack::Builder;
 use Plack::Util;
 use HTTP::Request::Common;
-use Carp::Always;
 
 test_psgi app => builder {
     enable 'FixMissingBodyInRedirect';
