@@ -1,4 +1,10 @@
+0.11
+
+    * Added repository and bugtracker information to metadata
+    * Removed unneeded dependency on Carp::Always
+
 0.10
+
     * Added Changes file & fixed POD (RT 94939, reported by Florian)
 
 0.09

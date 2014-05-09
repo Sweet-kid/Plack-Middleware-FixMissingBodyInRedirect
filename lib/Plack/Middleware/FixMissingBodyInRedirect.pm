@@ -107,4 +107,6 @@ Graham Knop <haarg@haarg.org>
 
 n0body, Mark Ellis <m@rkellis.com>
 
+ether, Karen Etheridge <ether@cpan.org>
+
 =cut
