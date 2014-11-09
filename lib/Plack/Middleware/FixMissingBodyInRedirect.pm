@@ -8,7 +8,7 @@ use HTML::Entities;
 use Scalar::Util qw(blessed);
 # ABSTRACT: Plack::Middleware which sets body for redirect response, if it's not already set
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 sub call {
     my $self = shift;
